@@ -15,7 +15,7 @@ import {
 
 import DataLoader from 'dataloader';
 
-import { Request, TypeMap, ExecutionResult } from '@graphql-tools/utils';
+import { Request, TypeMap, ExecutionResult, AsyncExecutionResult } from '@graphql-tools/utils';
 
 import { Subschema } from './Subschema';
 import { OBJECT_SUBSCHEMA_SYMBOL, FIELD_SUBSCHEMA_MAP_SYMBOL, UNPATHED_ERRORS_SYMBOL } from './symbols';
@@ -139,7 +139,10 @@ export type SyncExecutor = <TReturn = Record<string, any>, TArgs = Record<string
 ) => ExecutionResult<TReturn>;
 export type Executor = <TReturn = Record<string, any>, TArgs = Record<string, any>, TContext = Record<string, any>>(
   params: ExecutionParams<TArgs, TContext>
-) => ExecutionResult<TReturn> | Promise<ExecutionResult<TReturn>>;
+) =>
+  | ExecutionResult<TReturn>
+  | AsyncIterableIterator<AsyncExecutionResult<TReturn>>
+  | Promise<AsyncIterableIterator<AsyncExecutionResult<TReturn>> | ExecutionResult<TReturn>>;
 export type Subscriber = <TReturn = Record<string, any>, TArgs = Record<string, any>, TContext = Record<string, any>>(
   params: ExecutionParams<TArgs, TContext>
 ) => Promise<AsyncIterator<ExecutionResult<TReturn>> | ExecutionResult<TReturn>>;

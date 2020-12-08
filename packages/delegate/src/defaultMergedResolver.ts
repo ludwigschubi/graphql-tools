@@ -1,5 +1,7 @@
 import { defaultFieldResolver, GraphQLResolveInfo } from 'graphql';
 
+import isPromise from 'is-promise';
+
 import { getResponseKeyFromInfo } from '@graphql-tools/utils';
 
 import { resolveExternalValue } from './resolveExternalValue';
@@ -17,7 +19,7 @@ export function defaultMergedResolver(
   args: Record<string, any>,
   context: Record<string, any>,
   info: GraphQLResolveInfo
-) {
+): any {
   if (!parent) {
     return null;
   }
@@ -33,6 +35,10 @@ export function defaultMergedResolver(
   const data = parent[responseKey];
   const unpathedErrors = getUnpathedErrors(parent);
   const subschema = getSubschema(parent, responseKey);
+
+  if (isPromise(data)) {
+    return data.then(resolvedData => resolveExternalValue(resolvedData, unpathedErrors, subschema, context, info));
+  }
 
   return resolveExternalValue(data, unpathedErrors, subschema, context, info);
 }
